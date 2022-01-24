@@ -5,6 +5,7 @@
   "author": "Beach.io <beach.io>",
   "license": "MIT",
   "homepage": "http://chiselcms.com",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/beachio/chisel-parse-server-starter"
