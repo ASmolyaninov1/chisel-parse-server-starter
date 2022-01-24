@@ -1,4 +1,4 @@
-console.log('Cloud code connected');
+console.log('Cloud code connected kek lol');
 
 const {config, SITE, ROLE_ADMIN, ROLE_EDITOR, promisifyW, getAllObjects} = require('./common');
 
