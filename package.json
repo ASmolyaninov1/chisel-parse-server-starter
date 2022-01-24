@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@nessi/parse-server": "^4.5.2",
+    "capture-website": "^2.2.0",
+    "colorthief": "^2.3.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
