@@ -1,14 +1,14 @@
 {
   "parseConfig": {
-    "appName": "Mural palette extention",
-    "appId": "6e66d7ca36d7c271801bdada14bc9490",
-    "masterKey": "2d8fcc6094438a0246358cf8142e00d3",
+    "appName": "shark-956.getforge.io",
+    "appId": "10907e4927b09f11c09f5132d1712ded",
+    "masterKey": "845443be6b59c7de6e47a0f01c681730",
 
-    "port": 40123,
-    "URLserver": "https://dockerhost.forge-parse-server.c66.me:40123/parse",
-    "GraphQLURLserver": "http://localhost:40123/graphql",
+    "port": 40131,
+    "URLserver": "https://dockerhost.forge-parse-server.c66.me:40131/parse",
+    "GraphQLURLserver": "http://localhost:40131/graphql",
     "URLdb": "mongodb://localhost:27017/parse",
-    "URLsite": "http://chisel-cms-246.getforge.io",
+    "URLsite": "chisel-cms-253.getforge.io",
 
     "maxUploadSize": "10mb",
 
