@@ -1,17 +1,17 @@
-const express = require('express');
-const { default: ParseServer, ParseGraphQLServer } = require('@nessi/parse-server');
-const ParseDashboard = require('parse-dashboard');
-const Parse = require('parse/node');
-const muralAuthAdapter = require('parse-server-mural-auth-adapter');
-const request = require('request');
-const http = require('http');
-const path = require('path');
-const fs = require('fs');
-const cors = require('cors');
-const bodyParser = require('body-parser')
-const packageJSON = require('./package.json');
+import express from 'express';
+import ParseServer, { ParseGraphQLServer } from '@nessi/parse-server';
+import ParseDashboard from 'parse-dashboard';
+import Parse from 'parse/node';
+import muralAuthAdapter from 'parse-server-mural-auth-adapter';
+import request from 'request';
+import http from 'http';
+import path from 'path';
+import fs from 'fs';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import packageJSON from './package.json';
 
-const config = require('./config.json');
+import config from './config.json';
 
 let parseConfig = config.parseConfig;
 let StripeConfig = config.extraConfig.StripeConfig;
