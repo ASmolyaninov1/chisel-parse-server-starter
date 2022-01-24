@@ -698,6 +698,10 @@ Parse.Cloud.define("inviteUser", async request => {
   }
 });
 
+Parse.Cloud.define("test", request => {
+  return '==== Test ===='
+})
+
 Parse.Cloud.define("checkPassword", request => {
   if (!request.user)
     throw 'Must be signed in to call this Cloud Function.';
