@@ -699,6 +699,7 @@ Parse.Cloud.define("inviteUser", async request => {
 });
 
 Parse.Cloud.define("test", request => {
+  console.log('testtest')
   return '==== Test ===='
 })
 
