@@ -7,6 +7,7 @@ const request = require('request');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
 const bodyParser = require('body-parser')
 const packageJSON = require('./package.json');
 
@@ -70,6 +71,7 @@ const parseGraphQLServer = new ParseGraphQLServer(
   {graphQLPath: '/graphql'}
 );
 const app = new express();
+app.use(cors())
 app.use('/parse', parseServer.app);
 parseGraphQLServer.applyGraphQL(app);
 
