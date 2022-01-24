@@ -1,8 +1,20 @@
 console.log('Cloud code connected')
 
-import captureWebsite from 'capture-website';
-import ColorThief from 'colorthief';
-import fs from 'fs';
+const captureWebsite = require('capture-website');
+const ColorThief = require('colorthief');
+const fs = require('fs');
+
+const getPaletteByImageAndRemove = async imagePath => {
+  let result
+  try {
+    result = await ColorThief.getPalette(imagePath)
+  } catch (err) {
+    result = { status: 500, message: 'Get palette error' }
+  }
+
+  fs.unlink(imagePath, err => console.log('File remove error => ', err));
+  return result
+}
 
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params;
@@ -21,13 +33,7 @@ Parse.Cloud.define('getPalette', async request => {
     return { status: 400, message: 'Invalid brand url' };
   }
 
-  let result
-  try {
-    result = await ColorThief.getPalette(filePath)
-  } catch (err) {
-    result = { status: 500, message: 'Get palette error' }
-  }
-
-  fs.unlink(filePath, err => console.log('File remove error => ', err));
-  return result
+  return await getPaletteByImageAndRemove(filePath)
 })
+
+// Parse.Cloud.define('getPdfPalette', request)
