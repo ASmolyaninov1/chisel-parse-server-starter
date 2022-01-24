@@ -32,6 +32,7 @@ Parse.Cloud.define('getPalette', async request => {
   try {
     await captureWebsite.file(brandUrl, filePath, { fullPage: true });
   } catch (err) {
+    console.log('Invalid brand url', err)
     return { status: 400, message: 'Invalid brand url' };
   }
 
@@ -41,5 +42,6 @@ Parse.Cloud.define('getPalette', async request => {
 // Parse.Cloud.define('getPdfPalette', request => {
 //   const params = request.params
 //   const pdf = params.b64pdf
-//
+//   fs.writeFile
+//   fromBase64(pdf, { savePath: './' }).convert()
 // })
