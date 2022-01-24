@@ -1,9 +1,9 @@
 console.log('Cloud code connected')
 
-const captureWebsite = import('capture-website');
-const ColorThief = import('colorthief');
-const fs = import('fs');
-const pdf2pic = import('pdf2pic');
+const captureWebsite = await import('capture-website');
+const ColorThief = await import('colorthief');
+const fs = await import('fs');
+const pdf2pic = await import('pdf2pic');
 const { fromBase64 } = pdf2pic;
 
 const getPaletteByImageAndRemove = async imagePath => {
@@ -39,9 +39,9 @@ Parse.Cloud.define('getPalette', async request => {
   return await getPaletteByImageAndRemove(filePath)
 })
 
-// Parse.Cloud.define('getPdfPalette', request => {
-//   const params = request.params
-//   const pdf = params.b64pdf
-//   fs.writeFile
-//   fromBase64(pdf, { savePath: './' }).convert()
-// })
+Parse.Cloud.define('getPdfPalette', request => {
+  const params = request.params
+  const pdf = params.b64pdf
+  fs.writeFile
+  fromBase64(pdf, { savePath: './' }).convert()
+})
