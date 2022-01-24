@@ -4,7 +4,7 @@
     "appId": "10907e4927b09f11c09f5132d1712ded",
     "masterKey": "845443be6b59c7de6e47a0f01c681730",
 
-    "port": 40131,
+    "port": 1337,
     "URLserver": "https://dockerhost.forge-parse-server.c66.me:40131/parse",
     "GraphQLURLserver": "http://localhost:40131/graphql",
     "URLdb": "mongodb://localhost:27017/parse",
