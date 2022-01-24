@@ -1,14 +1,14 @@
 {
   "parseConfig": {
-    "appName": "Chisel",
-    "appId": "SampleAppId",
-    "masterKey": "SampleMasterKey",
+    "appName": "Mural palette extention",
+    "appId": "6e66d7ca36d7c271801bdada14bc9490",
+    "masterKey": "2d8fcc6094438a0246358cf8142e00d3",
 
-    "port": 1337,
-    "URLserver": "http://localhost:1337/parse",
+    "port": 40123,
+    "URLserver": "https://dockerhost.forge-parse-server.c66.me:40123/parse",
     "GraphQLURLserver": "http://localhost:1337/graphql",
     "URLdb": "mongodb://localhost:27017/parse",
-    "URLsite": "http://localhost:9000",
+    "URLsite": "https://mural-palette-extention.tk.getforge.io",
 
     "maxUploadSize": "10mb",
 
@@ -52,14 +52,9 @@
 
   "extraConfig": {
     "dashboardActivated": true,
-    "userEmail": "test",
-    "userPassword": "123456",
+    "userEmail": "a.smolyaninov@brightlab.me",
+    "userPassword": "Ve5MEuep",
 
-    "siteTemplates": true,
-
-    "StripeConfig": {
-      "keyPublic": "pk_test_sample",
-      "keyPrivate": "sk_test_sample"
-    }
+    "siteTemplates": true
   }
 }

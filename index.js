@@ -78,7 +78,7 @@ app.post('/users_code', bodyParser.json(), (req, res, next) => {
   {
     let usersCodeSuccess = false;
     let customTemplatesSuccess = true;
-    fs.writeFileSync("./cloud/users_code.js", req.body.custom_code, (err) =>{
+    fs.writeFileSync("./cloud/users_code.js", req.body.custom_code, (err) => {
         if (!err)
           usersCodeSuccess = true;
     });
