@@ -7,26 +7,21 @@ const pdf = require('pdf2pic');
 
 const getPaletteByImageAndRemove = async imagePath => {
   console.log('imagePath => ', imagePath)
-  const colorThief = await ColorThief
-  const resolveFs = await fs
-
-  console.log('colorTHief => ', colorThief)
 
   let result
   try {
-    result = await colorThief.getPalette(imagePath)
+    result = await ColorThief.getPalette(imagePath)
   } catch (err) {
     result = { status: 500, message: 'Get palette error' }
   }
 
-  resolveFs.unlink(imagePath, err => console.log('File remove error => ', err));
+  fs.unlink(imagePath, err => console.log('File remove error => ', err));
   return result
 }
 
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
-  const resolvedCaptureWebsite = await captureWebsite
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
@@ -36,7 +31,7 @@ Parse.Cloud.define('getPalette', async request => {
   const filePath = `./${filename}.png`;
 
   try {
-    await resolvedCaptureWebsite.file(brandUrl, filePath, { fullPage: true });
+    await captureWebsite.file(brandUrl, filePath, { fullPage: true });
   } catch (err) {
     console.log('Invalid brand url', err)
     return { status: 400, message: 'Invalid brand url' };
