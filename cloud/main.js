@@ -6,8 +6,8 @@ const fs = import('fs');
 const pdf = import('pdf2pic');
 
 const getPaletteByImageAndRemove = async imagePath => {
-  const colorThief = await ColorThief.resolve
-  const resolveFs = await fs.resolve
+  const colorThief = await ColorThief
+  const resolveFs = await fs
 
   let result
   try {
@@ -23,7 +23,7 @@ const getPaletteByImageAndRemove = async imagePath => {
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
-  const resolvedCaptureWebsite = await captureWebsite.resolve
+  const resolvedCaptureWebsite = await captureWebsite
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
