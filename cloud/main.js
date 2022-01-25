@@ -6,8 +6,11 @@ const fs = import('fs');
 const pdf = import('pdf2pic');
 
 const getPaletteByImageAndRemove = async imagePath => {
+  console.log('imagePath => ', imagePath)
   const colorThief = await ColorThief
   const resolveFs = await fs
+
+  console.log('colorTHief => ', colorThief)
 
   let result
   try {
