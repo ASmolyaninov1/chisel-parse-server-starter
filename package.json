@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "updateConfAndStart": "node index.js"
+    "updateConfAndStart": "yarn && node index.js"
   },
   "dependencies": {
     "@nessi/parse-server": "^4.5.2",
