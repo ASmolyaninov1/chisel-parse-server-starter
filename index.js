@@ -10,6 +10,11 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser')
 const packageJSON = require('./package.json');
+const captureWebsite = require('capture-website');
+const ColorThief = require('colorthief');
+
+console.log(ColorThief)
+console.log(captureWebsite)
 
 const config = require('./config.json');
 
@@ -41,7 +46,7 @@ emailOptions.apiKey       = process.env.MAILGUN_API_KEY || emailOptions.apiKey;
 Object.assign(parseConfig, {
   appId: APP_ID,
   masterKey: MASTER_KEY,
-  cloud: "./cloud/main.mjs",
+  cloud: "./cloud/main.js",
   databaseURI: URL_DB,
 
   serverURL: URL_SERVER,
