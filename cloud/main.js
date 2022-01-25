@@ -1,10 +1,5 @@
 console.log('Cloud code connected')
 
-import captureWebsite from 'capture-website';
-import ColorThief from 'colorthief';
-import fs from 'fs';
-import pdf from 'pdf2pic';
-
 const getPaletteByImageAndRemove = async imagePath => {
   console.log('imagePath => ', imagePath)
 
