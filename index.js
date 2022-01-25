@@ -10,8 +10,8 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser')
 const packageJSON = require('./package.json');
-const captureWebsite = require('capture-website');
-const ColorThief = require('colorthief');
+const captureWebsite = await import('capture-website');
+const ColorThief = await import('colorthief');
 
 console.log(ColorThief)
 console.log(captureWebsite)
