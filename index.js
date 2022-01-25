@@ -41,7 +41,7 @@ emailOptions.apiKey       = process.env.MAILGUN_API_KEY || emailOptions.apiKey;
 Object.assign(parseConfig, {
   appId: APP_ID,
   masterKey: MASTER_KEY,
-  cloud: "./cloud/main.js",
+  cloud: "./cloud/main.mjs",
   databaseURI: URL_DB,
 
   serverURL: URL_SERVER,
