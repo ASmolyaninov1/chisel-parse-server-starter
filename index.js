@@ -10,9 +10,6 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser')
 const packageJSON = require('./package.json');
-const captureWebsite = require('capture-website');
-const ColorThief = require('colorthief');
-const pdf = require('pdf2pic');
 
 const config = require('./config.json');
 
