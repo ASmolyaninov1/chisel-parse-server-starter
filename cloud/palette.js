@@ -1,5 +1,5 @@
 const getPaletteByImageAndRemove = async imagePath => {
-  const ColorThief = await import('colorthief')
+  const ColorThief = await import('../node_modules/colorthief/build/build')
   const fs = await import('fs')
 
   let result
@@ -16,7 +16,7 @@ const getPaletteByImageAndRemove = async imagePath => {
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
-  const captureWebsite = await import('capture-website')
+  const captureWebsite = await import('../node_modules/capture-website')
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
