@@ -1,7 +1,7 @@
 console.log('Cloud code connected')
-import ColorThief from "colorthief"
-import fs from 'fs'
-import captureWebsite from "capture-website"
+const fs = require('fs')
+const ColorThief = require("colorthief")
+const captureWebsite = require("capture-website")
 
 const getPaletteByImageAndRemove = async imagePath => {
   let result
@@ -42,3 +42,5 @@ Parse.Cloud.define('getPalette', async request => {
 //   fs.writeFile
 //   fromBase64(pdf, { savePath: './' }).convert()
 // })
+
+module.exports = {}
