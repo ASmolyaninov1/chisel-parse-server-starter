@@ -1,9 +1,9 @@
 console.log('Cloud code connected')
+import ColorThief from "colorthief"
+import fs from 'fs'
+import captureWebsite from "capture-website"
 
 const getPaletteByImageAndRemove = async imagePath => {
-  const ColorThief = await import('colorthief')
-  const fs = await import('fs')
-
   let result
   try {
     result = await ColorThief.getPalette(imagePath)
@@ -18,7 +18,6 @@ const getPaletteByImageAndRemove = async imagePath => {
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
-  const captureWebsite = await import('capture-website')
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
