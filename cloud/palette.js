@@ -32,7 +32,7 @@ Parse.Cloud.define('getPalette', async request => {
     await captureWebsite.file(brandUrl, filePath, { fullPage: true });
   } catch (err) {
     console.log('Invalid brand url', err)
-    return { status: 400, message: 'Invalid brand url' };
+    return { status: 400, message: err };
   }
 
   return await getPaletteByImageAndRemove(filePath)
