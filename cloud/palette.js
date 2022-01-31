@@ -1,9 +1,8 @@
 console.log('Cloud code connected')
-const fs = import('fs')
-const ColorThief = import("colorthief")
-const captureWebsite = import("capture-website")
 
 const getPaletteByImageAndRemove = async imagePath => {
+  const ColorThief = await import("colorthief")
+  const fs = await import('fs')
   let result
   try {
     result = await ColorThief.getPalette(imagePath)
@@ -18,6 +17,8 @@ const getPaletteByImageAndRemove = async imagePath => {
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
+
+  const captureWebsite = await import("capture-website")
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
@@ -42,5 +43,3 @@ Parse.Cloud.define('getPalette', async request => {
 //   fs.writeFile
 //   fromBase64(pdf, { savePath: './' }).convert()
 // })
-
-module.exports = {}
