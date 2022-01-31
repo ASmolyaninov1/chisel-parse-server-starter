@@ -19,7 +19,7 @@ Parse.Cloud.define('getPalette', async request => {
   const brandUrl = params?.brandUrl;
 
   const captureWebsite = await import("capture-website")
-  console.log('captureWebsite file function => ', captureWebsite.file)
+  console.log('captureWebsite file function => ', captureWebsite)
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
@@ -29,7 +29,7 @@ Parse.Cloud.define('getPalette', async request => {
   const filePath = `./${filename}.png`;
 
   try {
-    await captureWebsite.file(brandUrl, filePath, { fullPage: true });
+    await captureWebsite.default.file(brandUrl, filePath, { fullPage: true });
   } catch (err) {
     console.log('Invalid brand url', err)
     return { status: 400, message: err };
