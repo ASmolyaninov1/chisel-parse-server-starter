@@ -19,7 +19,7 @@ Parse.Cloud.define('getPalette', async request => {
   const brandUrl = params?.brandUrl;
 
   const captureWebsite = await import("capture-website")
-  console.log('captureWebsite file function => ', captureWebsite)
+  console.log('captureWebsite file function => ', captureWebsite.default)
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
