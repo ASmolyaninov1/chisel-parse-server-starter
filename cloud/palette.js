@@ -1,7 +1,7 @@
 console.log('Cloud code connected')
-const fs = require('fs')
-const ColorThief = require("colorthief")
-const captureWebsite = require("capture-website")
+const fs = import('fs')
+const ColorThief = import("colorthief")
+const captureWebsite = import("capture-website")
 
 const getPaletteByImageAndRemove = async imagePath => {
   let result
