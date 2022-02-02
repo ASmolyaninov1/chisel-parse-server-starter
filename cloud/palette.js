@@ -1,5 +1,3 @@
-import { cat } from "yarn/lib/cli"
-
 console.log('Cloud code connected')
 
 const getPaletteByImageAndRemove = async imagePath => {
