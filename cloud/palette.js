@@ -2,6 +2,7 @@ console.log('Cloud code connected')
 
 const getPaletteByImageAndRemove = async imagePath => {
   const ColorThief = await import("colorthief")
+  const fs = await import("fs")
   let result
   try {
     result = await ColorThief.default.getPalette(imagePath)
@@ -9,6 +10,7 @@ const getPaletteByImageAndRemove = async imagePath => {
     result = { status: 500, message: 'Get palette error' }
   }
 
+  fs.default.unlink(imagePath)
   return result
 }
 
