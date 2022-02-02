@@ -30,7 +30,7 @@ Parse.Cloud.define('getPalette', async request => {
       no_ads: true
     }
   }).then(res => {
-
+    console.log('res => ', res)
   }).catch((err) => {
     console.log('Invalid brand url', err)
     return { status: 400, message: err };
