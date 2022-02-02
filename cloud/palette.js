@@ -2,7 +2,6 @@ console.log('Cloud code connected')
 
 const getPaletteByImageAndRemove = async imagePath => {
   const ColorThief = await import("colorthief")
-  const fs = await import('fs')
   let result
   try {
     result = await ColorThief.getPalette(imagePath)
@@ -10,31 +9,36 @@ const getPaletteByImageAndRemove = async imagePath => {
     result = { status: 500, message: 'Get palette error' }
   }
 
-  fs.unlink(imagePath, err => console.log('File remove error => ', err));
   return result
 }
 
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
-
-  const captureWebsite = await import("capture-website")
+  const axios = await import('axios')
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
   }
 
-  const filename = brandUrl.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  const filePath = `./${filename}.png`;
+  await axios.get('https://api.apiflash.com/v1/urltoimage', {
+    params: {
+      access_key: '8050ceb6f483464daf907546ded78c06',
+      url: brandUrl,
+      full_page: true,
+      quality: 100,
+      no_ads: true
+    }
+  }).then(res => {
 
-  try {
-    await captureWebsite.default.file(brandUrl, filePath, { fullPage: true });
-  } catch (err) {
+  }).catch((err) => {
     console.log('Invalid brand url', err)
     return { status: 400, message: err };
-  }
+  })
 
-  return await getPaletteByImageAndRemove(filePath)
+  return 'test'
+
+  // return await getPaletteByImageAndRemove(filePath)
 })
 
 // Parse.Cloud.define('getPdfPalette', request => {

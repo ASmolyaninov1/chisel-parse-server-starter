@@ -1,14 +1,14 @@
 {
   "parseConfig": {
     "appName": "mural-palette-extention.getforge.io",
-    "appId": "4f5d3e041400f45b0b478c96c527aee1",
-    "masterKey": "c4d6eedf62f22b670edd4a2085397190",
+    "appId": "b334e60e0d3181d1bf0f544a9f4c4caf",
+    "masterKey": "0b31d1d5f133ddd9333232396daba892",
 
     "port": 1337,
     "URLserver": "https://dockerhost.forge-parse-server.c66.me:40140/parse",
     "GraphQLURLserver": "http://localhost:40138/graphql",
     "URLdb": "mongodb://localhost:27017/parse",
-    "URLsite": "chisel-cms-257.getforge.io",
+    "URLsite": "chisel-cms-258.getforge.io",
 
     "maxUploadSize": "10mb",
 
