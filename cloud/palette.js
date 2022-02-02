@@ -21,7 +21,7 @@ Parse.Cloud.define('getPalette', async request => {
     return { status: 400, message: 'Please provide field brandUrl' };
   }
 
-  await axios.get('https://api.apiflash.com/v1/urltoimage', {
+  await axios.default.get('https://api.apiflash.com/v1/urltoimage', {
     params: {
       access_key: '8050ceb6f483464daf907546ded78c06',
       url: brandUrl,
