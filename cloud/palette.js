@@ -1,15 +1,18 @@
 console.log('Cloud code connected')
 
-const getPaletteByImageAndRemove = async imagePath => {
+const getPaletteByImageAndRemove = async filename => {
   const ColorThief = await import("colorthief")
   const fs = await import("fs")
+  const path = await import("path")
   let result
+  const imagePath = path.default.resolve(process.cwd(), filename);
+  console.log(imagePath)
   try {
     result = await ColorThief.default.getPalette(imagePath)
   } catch (err) {
     result = { status: 500, message: 'Get palette error: ' + err.message }
   }
-  fs.default.rm('./' + imagePath, (err) => console.log('Remove error message ===> ', err))
+  fs.default.rm(imagePath, (err) => console.log('Remove error message ===> ', err))
   return result
 }
 
