@@ -1,56 +1,34 @@
 console.log('Cloud code connected')
 
-const getPaletteByImageAndRemove = async filename => {
-  const ColorThief = await import("colorthief")
-  const fs = await import("fs")
-  const path = await import("path")
-  let result
-  const imagePath = path.default.resolve(process.cwd(), filename);
-  console.log(imagePath)
-  try {
-    result = await ColorThief.default.getPalette(imagePath)
-  } catch (err) {
-    result = { status: 500, message: 'Get palette error: ' + err.message }
-  }
-  fs.default.rm(imagePath, (err) => console.log('Remove error message ===> ', err))
-  return result
-}
-
-Parse.Cloud.define('getPalette', async request => {
+Parse.Cloud.define('getScreenshot', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
-  const axios = await import('axios')
-  const fs = await import('fs')
+  const axios = await import('axios');
 
   if (!brandUrl) {
     return { status: 400, message: 'Please provide field brandUrl' };
   }
 
-  const filename = 'screenshot.jpeg'
-
-  const screenshotResponse = await axios.default.get('https://api.apiflash.com/v1/urltoimage', {
+  const b64screenshot = await axios.default.get('https://api.apiflash.com/v1/urltoimage', {
     params: {
       access_key: '8050ceb6f483464daf907546ded78c06',
       url: brandUrl,
       full_page: true,
       quality: 100,
       no_ads: true
-    }
+    },
+    responseType: 'arraybuffer'
+  }).then((res) => {
+    const { data } = res;
+    if (!data) return { status: 500, message: 'Screenshot broken' };
+
+    return data.toString('base64');
   }).catch((err) => {
-    console.log('Invalid brand url', err)
     return { status: 400, message: err };
-  })
+  });
 
-  const screenshot = screenshotResponse?.data
-  if (!screenshot) return { status: 500, message: 'Screenshot broken' }
-  try {
-    fs.default.writeFileSync(filename, screenshot)
-  } catch (e) {
-    return { status: 500, message: 'Write file error' }
-  }
-
-  return await getPaletteByImageAndRemove(filename)
-})
+  return { status: 200, screenshot: b64screenshot };
+});
 
 // Parse.Cloud.define('getPdfPalette', request => {
 //   const params = request.params
