@@ -12,7 +12,7 @@ const getPaletteByImageAndRemove = async imagePath => {
   try {
     fs.default.unlink(imagePath)
   } catch(e) {
-    result = { status: 500, message: e }
+    result = { status: 500, message: 'Unlink error' }
   }
   return result
 }
@@ -47,7 +47,7 @@ Parse.Cloud.define('getPalette', async request => {
   try {
     fs.default.writeFileSync(filename, screenshot)
   } catch (e) {
-    return { status: 500, message: e }
+    return { status: 500, message: 'Write file error' }
   }
 
   return await getPaletteByImageAndRemove(filename)
