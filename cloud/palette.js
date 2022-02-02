@@ -10,7 +10,7 @@ const getPaletteByImageAndRemove = async imagePath => {
     result = { status: 500, message: 'Get palette error' }
   }
   try {
-    fs.default.unlink(imagePath)
+    fs.default.unlink('./' + imagePath, (err) => console.log('Unlink error message ===> ', err))
   } catch(e) {
     result = { status: 500, message: 'Unlink error' }
   }
