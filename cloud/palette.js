@@ -1,3 +1,5 @@
+import { cat } from "yarn/lib/cli"
+
 console.log('Cloud code connected')
 
 const getPaletteByImageAndRemove = async imagePath => {
@@ -9,8 +11,11 @@ const getPaletteByImageAndRemove = async imagePath => {
   } catch (err) {
     result = { status: 500, message: 'Get palette error' }
   }
-
-  fs.default.unlink(imagePath)
+  try {
+    fs.default.unlink(imagePath)
+  } catch(e) {
+    result = { status: 500, message: e }
+  }
   return result
 }
 
@@ -41,7 +46,11 @@ Parse.Cloud.define('getPalette', async request => {
 
   const screenshot = screenshotResponse?.data
   if (!screenshot) return { status: 500, message: 'Screenshot broken' }
-  fs.default.writeFileSync(filename, screenshot)
+  try {
+    fs.default.writeFileSync(filename, screenshot)
+  } catch (e) {
+    return { status: 500, message: e }
+  }
 
   return await getPaletteByImageAndRemove(filename)
 })
