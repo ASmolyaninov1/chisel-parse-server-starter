@@ -7,13 +7,9 @@ const getPaletteByImageAndRemove = async imagePath => {
   try {
     result = await ColorThief.default.getPalette(imagePath)
   } catch (err) {
-    result = { status: 500, message: 'Get palette error' }
+    result = { status: 500, message: 'Get palette error: ' + err.message }
   }
-  try {
-    fs.default.rm('./' + imagePath, (err) => console.log('Remove error message ===> ', err))
-  } catch(e) {
-    result = { status: 500, message: 'Remove error: ' + e.message }
-  }
+  fs.default.rm('./' + imagePath, (err) => console.log('Remove error message ===> ', err))
   return result
 }
 
