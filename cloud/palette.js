@@ -30,9 +30,12 @@ Parse.Cloud.define('getScreenshot', async request => {
   return { status: 200, screenshot: b64screenshot };
 });
 
-// Parse.Cloud.define('getPdfPalette', request => {
-//   const params = request.params
-//   const pdf = params.b64pdf
-//   fs.writeFile
-//   fromBase64(pdf, { savePath: './' }).convert()
-// })
+Parse.Cloud.define('getPdfScreenshot', async request => {
+  const params = request.params
+  console.log('params => ', params)
+  const pdf = params.pdf
+
+  const pdf2pic = await import('pdf2pic')
+  const pdfImage = await pdf2pic.default.fromBuffer(pdf).convert()
+  return { status: 200, pdfImage }
+})
