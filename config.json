@@ -10,7 +10,7 @@
     "URLdb": "mongodb://localhost:27017/parse",
     "URLsite": "chisel-cms-258.getforge.io",
 
-    "maxUploadSize": "10mb",
+    "maxUploadSize": "50mb",
 
     "verifyUserEmails": true,
     "preventLoginWithUnverifiedEmail": true,

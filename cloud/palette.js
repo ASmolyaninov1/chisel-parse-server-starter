@@ -32,10 +32,12 @@ Parse.Cloud.define('getScreenshot', async request => {
 
 Parse.Cloud.define('getPdfScreenshot', async request => {
   const params = request.params
-  console.log('params => ', params)
   const pdf = params.pdf
 
+  console.log('pdf => ', pdf)
+
   const pdf2pic = await import('pdf2pic')
+  console.log('pdf2pic.default => ', pdf2pic.default)
   const pdfImage = await pdf2pic.default.fromBuffer(pdf).convert()
   return { status: 200, pdfImage }
 })
