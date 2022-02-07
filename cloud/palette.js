@@ -32,11 +32,12 @@ Parse.Cloud.define('getScreenshot', async request => {
 
 Parse.Cloud.define('getPdfScreenshot', async request => {
   const params = request.params
-  const pdf = params.pdf
+  const b64pdf = params.pdf
 
-  const pdf2pic = await import('pdf2pic')
-  const pdfImage = await pdf2pic.default.fromBase64(pdf)(1, true)
-  console.log('pdfImage => ', pdfImage)
+  const axios = await import('axios')
+  const fs = await import('fs')
+  const pdf = await fs.default.readFile(b64pdf, { encoding: 'base64' })
+  const res = await axios.post('https://v2.convertapi.com/convert/pdf/to/jpg?Secret=y1Tyo5zBrFdTzLRb&StoreFile=true', { File: pdf })
 
-  return { status: 200, pdfImage }
+  return { status: 200, result: res }
 })
