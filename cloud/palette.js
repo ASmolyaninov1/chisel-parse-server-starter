@@ -35,7 +35,8 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
   const pdf = params.pdf
 
   const pdf2pic = await import('pdf2pic')
-  const pdfImage = await pdf2pic.default.fromBase64(pdf)(1, true)
+  const pdfImage = await pdf2pic.default.fromBase64(pdf)(-1, true)
+  console.log('pdfImage => ', pdfImage)
 
   return { status: 200, pdfImage }
 })
