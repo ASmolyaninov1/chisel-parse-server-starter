@@ -36,16 +36,20 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 
   const axios = await import('axios')
   const fs = await import('fs')
-  try {
-    await fs.default.writeFile('pdf.pdf', b64pdf, { encoding: 'base64' }, (err) => console.log('callback err => ', err))
-  } catch (err) {
-    console.log('write file err ======> ', err)
-    console.log('write file err message ======> ', err.message)
-  }
+  const FormData = await import('form-data')
+  const fd = new FormData.default()
+  const pdfBuffer = await fs.default.readFile(b64pdf)
+  fd.append('File', pdfBuffer)
+  // try {
+  //   await fs.default.writeFile('pdf.pdf', b64pdf, { encoding: 'base64' }, (err) => console.log('callback err => ', err))
+  // } catch (err) {
+  //   console.log('write file err ======> ', err)
+  //   console.log('write file err message ======> ', err.message)
+  // }
 
   let res
   try {
-    res = await axios.default.post('https://v2.convertapi.com/convert/pdf/to/jpg?Secret=y1Tyo5zBrFdTzLRb&StoreFile=true', { File: 'pdf.pdf' })
+    res = await axios.default.post('https://v2.convertapi.com/convert/pdf/to/jpg?Secret=y1Tyo5zBrFdTzLRb&StoreFile=true', fd)
   } catch (err) {
     console.log('api request error =======> ', err)
     console.log('api request error message =======> ', err.message)
