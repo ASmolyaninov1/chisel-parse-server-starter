@@ -36,8 +36,20 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 
   const axios = await import('axios')
   const fs = await import('fs')
-  const pdf = await fs.default.readFile(b64pdf, { encoding: 'base64' })
-  const res = await axios.post('https://v2.convertapi.com/convert/pdf/to/jpg?Secret=y1Tyo5zBrFdTzLRb&StoreFile=true', { File: pdf })
+  try {
+    await fs.default.writeFile('pdf.pdf', b64pdf, { encoding: 'base64' })
+  } catch (err) {
+    console.log('write file err ======> ', err)
+    console.log('write file err message ======> ', err.message)
+  }
+
+  let res
+  try {
+    res = await axios.post('https://v2.convertapi.com/convert/pdf/to/jpg?Secret=y1Tyo5zBrFdTzLRb&StoreFile=true', { File: 'pdf.pdf' })
+  } catch (err) {
+    console.log('api request error =======> ', err)
+    console.log('api request error message =======> ', err.message)
+  }
 
   return { status: 200, result: res }
 })
