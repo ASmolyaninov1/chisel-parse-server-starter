@@ -36,23 +36,28 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 
   const axios = await import('axios')
   const FormData = await import('form-data')
+
   const fd = new FormData.default()
   const bufferFile = Buffer.from(b64pdf, 'base64')
   fd.append('File', bufferFile, { filename: 'pdf.pdf' })
 
   let res
+  let pdfImagesData
   try {
-    res = await axios.default.post(
-      'https://v2.convertapi.com/convert/pdf/to/jpg?Secret=y1Tyo5zBrFdTzLRb&StoreFile=true',
+    pdfImagesData = await axios.default.post(
+      'https://v2.convertapi.com/convert/pdf/to/jpg?Secret=y1Tyo5zBrFdTzLRb&S&StoreFile=true',
       fd,
       {
         headers: fd.getHeaders()
       }
     )
   } catch (err) {
-    console.log('api request error message =======> ', err)
-    console.log('api request error =======> ', err.message)
+    res = { status: 500, message: err.message }
   }
 
-  return { status: 200, res: res?.data?.Files }
+  if (pdfImagesData?.data?.Files) {
+    res = pdfImagesData?.data?.Files
+  }
+
+  return res
 })
