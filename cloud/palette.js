@@ -1,33 +1,33 @@
 console.log('Cloud code connected')
 
-Parse.Cloud.define('getScreenshot', async request => {
+Parse.Cloud.define('getSiteScreenshot', async request => {
   const params = request.params;
   const brandUrl = params?.brandUrl;
   const axios = await import('axios');
 
   if (!brandUrl) {
-    return { status: 400, message: 'Please provide field brandUrl' };
+    return { error: 'Please provide field brandUrl' };
   }
 
-  const b64screenshot = await axios.default.get('https://api.apiflash.com/v1/urltoimage', {
-    params: {
-      access_key: '8050ceb6f483464daf907546ded78c06',
-      url: brandUrl,
-      full_page: true,
-      quality: 100,
-      no_ads: true
-    },
-    responseType: 'arraybuffer'
-  }).then((res) => {
-    const { data } = res;
-    if (!data) return { status: 500, message: 'Screenshot broken' };
+  try {
+    const b64screenshotData = await axios.default.get('https://api.apiflash.com/v1/urltoimage', {
+      params: {
+        access_key: '8050ceb6f483464daf907546ded78c06',
+        url: brandUrl,
+        full_page: true,
+        quality: 100,
+        no_ads: true
+      },
+      responseType: 'arraybuffer'
+    })
 
-    return data.toString('base64');
-  }).catch((err) => {
-    return { status: 400, message: err };
-  });
+    const { data } = b64screenshotData
+    if (!data) return { error: 'Screenshot broken' };
 
-  return { status: 200, screenshot: b64screenshot };
+    return { result: data.toString('base64') };
+  } catch(err) {
+    return { error: err };
+  }
 });
 
 Parse.Cloud.define('getPdfScreenshot', async request => {
@@ -41,7 +41,6 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
   const bufferFile = Buffer.from(b64pdf, 'base64')
   fd.append('File', bufferFile, { filename: 'pdf.pdf' })
 
-  let res
   let pdfImagesData
   try {
     pdfImagesData = await axios.default.post(
@@ -52,12 +51,58 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
       }
     )
   } catch (err) {
-    res = { status: 500, message: err.message }
+    return { error: err.message }
   }
 
   if (pdfImagesData?.data?.Files) {
-    res = pdfImagesData?.data?.Files
+    return { result: pdfImagesData?.data?.Files }
+  } else {
+    return { error: 'Something went wrong' }
   }
+})
 
-  return res
+Parse.Cloud.define('createPalette', async request => {
+  const params = request.params
+  const colors = params.colors
+  if (!colors || !colors.length) return { error: 'Provide "colors" field to set palette' }
+
+  const Palette = Parse.Object.extend("Palette")
+  const palette = new Palette()
+
+  palette.set("colors", colors)
+
+  try {
+    await palette.save()
+    return { result: 'success' }
+  } catch (e) {
+    return { error: e }
+  }
+})
+
+Parse.Cloud.define('getPalette', async request => {
+  const params = request.params
+  const id = params.id
+  if (!id) return { error: "Provide palette id to get" }
+
+  const Palette = Parse.Object.extend("Palette")
+  const query = new Parse.Query(Palette)
+
+  try {
+    const currentPalette = await query.get(id)
+    return { result: currentPalette }
+  } catch (e) {
+    return { error: e }
+  }
+})
+
+Parse.Cloud.define('getAllPalettes', async () => {
+  const Palette = Parse.Object.extend("Palette")
+  const query = new Parse.Query(Palette)
+
+  try {
+    const allPalettes = await query.find()
+    return { result: allPalettes }
+  } catch (e) {
+    return { error: e }
+  }
 })
