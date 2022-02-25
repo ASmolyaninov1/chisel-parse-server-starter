@@ -64,12 +64,15 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 Parse.Cloud.define('createPalette', async request => {
   const params = request.params
   const colors = params.colors
+  const title = params.title
   if (!colors || !colors.length) return { error: 'Provide "colors" field to set palette' }
+  if (!title) return { error: 'Provide "title" field to set palette' }
 
   const Palette = Parse.Object.extend("Palette")
   const palette = new Palette()
 
   palette.set("colors", colors)
+  palette.set("title", title)
 
   try {
     await palette.save()
@@ -102,6 +105,23 @@ Parse.Cloud.define('getAllPalettes', async () => {
   try {
     const allPalettes = await query.find()
     return { result: allPalettes }
+  } catch (e) {
+    return { error: e }
+  }
+})
+
+Parse.Cloud.define('deletePalette', async request => {
+  const params = request.params
+  const id = params?.id
+  if (!id) return { error: 'Provide "id" to delete palette' }
+
+  const Palette = Parse.Object.extend("Palette")
+  const query = new Parse.Query(Palette)
+
+  try {
+    const paletteToDelete = await query.get(id)
+    await paletteToDelete.destroy()
+    return { result: 'success' }
   } catch (e) {
     return { error: e }
   }
