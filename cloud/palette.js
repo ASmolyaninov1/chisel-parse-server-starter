@@ -71,11 +71,8 @@ Parse.Cloud.define('createPalette', async request => {
   const Palette = Parse.Object.extend("Palette")
   const palette = new Palette()
 
-  palette.set("colors", colors)
-  palette.set("title", title)
-
   try {
-    await palette.save()
+    await palette.save({ colors, title })
     return { result: 'success' }
   } catch (e) {
     return { error: e }
@@ -122,6 +119,28 @@ Parse.Cloud.define('deletePalette', async request => {
     const paletteToDelete = await query.get(id)
     await paletteToDelete.destroy()
     return { result: 'success' }
+  } catch (e) {
+    return { error: e }
+  }
+})
+
+Parse.Cloud.define('updatePalette', async (request, response) => {
+  const params = request.params
+  const { id, colors, title } = params || {}
+  if (!id || (!colors && !title)) return { error: 'Provide "id" and "colors" or "title" fields to update palette' }
+
+  const Palette = Parse.Object.extend("Palette")
+  const query = new Parse.Query(Palette)
+
+  try {
+    query.equalTo("objectId", id)
+    return query.find().then(res => {
+      const object = res[0]
+      !!colors && object.set('colors', colors)
+      !!title && object.set('title', title)
+      object.save()
+      return { result: 'success' }
+    })
   } catch (e) {
     return { error: e }
   }
