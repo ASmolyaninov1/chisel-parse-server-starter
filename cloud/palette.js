@@ -2,7 +2,7 @@ console.log('Cloud code connected')
 
 Parse.Cloud.define('getSiteScreenshot', async request => {
   const params = request.params;
-  const brandUrl = params?.brandUrl;
+  const { brandUrl } = params;
   const axios = await import('axios');
 
   if (!brandUrl) {
@@ -63,17 +63,16 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 
 Parse.Cloud.define('createPalette', async request => {
   const params = request.params
-  const colors = params.colors
-  const title = params.title
-  if (!colors || !colors.length) return { error: 'Provide "colors" field to set palette' }
+  const { colors, title, access } = params
+  if (!colors || !colors.length || !access) return { error: 'Provide "colors" field to set palette' }
   if (!title) return { error: 'Provide "title" field to set palette' }
 
   const Palette = Parse.Object.extend("Palette")
   const palette = new Palette()
 
   try {
-    await palette.save({ colors, title })
-    return { result: 'success' }
+    const createdPalette = await palette.save({ colors, title, access })
+    return { result: createdPalette }
   } catch (e) {
     return { error: e }
   }
@@ -81,7 +80,7 @@ Parse.Cloud.define('createPalette', async request => {
 
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params
-  const id = params.id
+  const { id } = params
   if (!id) return { error: "Provide palette id to get" }
 
   const Palette = Parse.Object.extend("Palette")
@@ -109,7 +108,7 @@ Parse.Cloud.define('getAllPalettes', async () => {
 
 Parse.Cloud.define('deletePalette', async request => {
   const params = request.params
-  const id = params?.id
+  const { id } = params
   if (!id) return { error: 'Provide "id" to delete palette' }
 
   const Palette = Parse.Object.extend("Palette")
@@ -124,10 +123,12 @@ Parse.Cloud.define('deletePalette', async request => {
   }
 })
 
-Parse.Cloud.define('updatePalette', async (request, response) => {
+Parse.Cloud.define('updatePalette', async (request) => {
   const params = request.params
-  const { id, colors, title } = params || {}
-  if (!id || (!colors && !title)) return { error: 'Provide "id" and "colors" or "title" fields to update palette' }
+  const { id, colors, title, access } = params
+  if (!id || (!colors && !title && !access)) {
+    return { error: 'Provide "id" and "colors" or "title" fields to update palette' }
+  }
 
   const Palette = Parse.Object.extend("Palette")
   const query = new Parse.Query(Palette)
@@ -138,6 +139,7 @@ Parse.Cloud.define('updatePalette', async (request, response) => {
       const object = res[0]
       !!colors && object.set('colors', colors)
       !!title && object.set('title', title)
+      !!access && object.set('access', access)
       object.save()
       return { result: 'success' }
     })
