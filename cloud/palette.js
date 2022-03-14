@@ -64,7 +64,8 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 Parse.Cloud.define('createPalette', async request => {
   const params = request.params
   const { colors, title, access } = params
-  if (!colors || !colors.length || !access) return { error: 'Provide "colors" field to set palette' }
+  if (!access) return { error: 'Provide "access" field to set palette' }
+  if (!colors || !colors.length) return { error: 'Provide "colors" field to set palette' }
   if (!title) return { error: 'Provide "title" field to set palette' }
 
   const Palette = Parse.Object.extend("Palette")
@@ -126,7 +127,8 @@ Parse.Cloud.define('deletePalette', async request => {
 Parse.Cloud.define('updatePalette', async (request) => {
   const params = request.params
   const { id, colors, title, access } = params
-  if (!id || (!colors && !title && !access)) {
+  const isParamsValid = !!colors || !!title || !!access
+  if (!id || !isParamsValid) {
     return { error: 'Provide "id" and "colors" or "title" fields to update palette' }
   }
 
