@@ -1,5 +1,6 @@
 const express = require('express');
 const { default: ParseServer, ParseGraphQLServer } = require('@nessi/parse-server');
+const test = require('@nessi/parse-server');
 const ParseDashboard = require('parse-dashboard');
 const Parse = require('parse/node');
 const muralAuthAdapter = require('parse-server-mural-auth-adapter');

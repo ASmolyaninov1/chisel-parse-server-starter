@@ -1,4 +1,4 @@
-console.log('Cloud code connected')
+const { getUser } = require('../helpers/user')
 
 Parse.Cloud.define('getSiteScreenshot', async request => {
   const params = request.params;
@@ -62,17 +62,40 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 })
 
 Parse.Cloud.define('createPalette', async request => {
+  const headers = request.headers
   const params = request.params
+  const { muralUsername } = headers
   const { colors, title, access } = params
+
+  if (!muralUsername) return { error: 'Provide "muralUsername" header to set palette' }
   if (!access) return { error: 'Provide "access" field to set palette' }
   if (!colors || !colors.length) return { error: 'Provide "colors" field to set palette' }
   if (!title) return { error: 'Provide "title" field to set palette' }
+
+  const currentUser = await getUser(muralUsername)
 
   const Palette = Parse.Object.extend("Palette")
   const palette = new Palette()
 
   try {
     const createdPalette = await palette.save({ colors, title, access })
+    const UserPalette = Parse.Object.extend("UserPalette")
+    const userPalette = new UserPalette()
+    userPalette.set("paletteId", createdPalette.objectId)
+    userPalette.set("access", access)
+    switch (access) {
+      case 'me':
+        userPalette.set("foreignKey", currentUser.muralUsername)
+        break
+      case 'workspace':
+        userPalette.set("foreignKey", currentUser.muralWorkspace)
+        break
+      case 'company':
+        userPalette.set("foreignKey", currentUser.muralCompany)
+        break
+    }
+    await userPalette.save()
+
     return { result: createdPalette }
   } catch (e) {
     return { error: e }
@@ -81,13 +104,27 @@ Parse.Cloud.define('createPalette', async request => {
 
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params
+  const headers = request.headers
+  const { muralUsername } = headers
   const { id } = params
+  if (!muralUsername) return { error: 'Provide "muralUsername" in headers' }
   if (!id) return { error: "Provide palette id to get" }
 
-  const Palette = Parse.Object.extend("Palette")
-  const query = new Parse.Query(Palette)
+  const currentUser = getUser(muralUsername)
+
+  if (!currentUser?.muralUsername) return { error: 'User not found' }
 
   try {
+    const Palette = Parse.Object.extend("Palette")
+    const query = new Parse.Query(Palette)
+
+    const UserPalette = Parse.Object.extend("UserPalette")
+    const userPaletteQuery = new Parse.Query(UserPalette)
+    userPaletteQuery.equalTo('muralUsername', currentUser.muralUsername)
+    userPaletteQuery.equalTo('paletteId', id)
+    const currentUserPalette = await userPaletteQuery.first()
+    if (!currentUserPalette?.paletteId) return { error: 'Palette not found' }
+
     const currentPalette = await query.get(id)
     return { result: currentPalette }
   } catch (e) {
@@ -95,7 +132,7 @@ Parse.Cloud.define('getPalette', async request => {
   }
 })
 
-Parse.Cloud.define('getAllPalettes', async () => {
+Parse.Cloud.define('getAllPalettes', async (request) => {
   const Palette = Parse.Object.extend("Palette")
   const query = new Parse.Query(Palette)
 
@@ -139,6 +176,7 @@ Parse.Cloud.define('updatePalette', async (request) => {
     query.equalTo("objectId", id)
     return query.find().then(res => {
       const object = res[0]
+      console.log(object.get('access'))
       !!colors && object.set('colors', colors)
       !!title && object.set('title', title)
       !!access && object.set('access', access)
