@@ -5,7 +5,7 @@
     "masterKey": "0b31d1d5f133ddd9333232396daba892",
 
     "port": 1337,
-    "URLserver": "https://dockerhost.forge-parse-server.c66.me:40140/parse",
+    "URLserver": "https://163.ignite.getforge.com/parse",
     "GraphQLURLserver": "http://localhost:40138/graphql",
     "URLdb": "mongodb://localhost:27017/parse",
     "URLsite": "chisel-cms-258.getforge.io",
