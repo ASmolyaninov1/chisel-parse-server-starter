@@ -190,6 +190,7 @@ Parse.Cloud.define('updatePalette', async (request) => {
 
 Parse.Cloud.define('getOrCreateMuralUser', async request => {
   const params = request.params
+  console.log('<========= test console log =========>')
   const { id, workspaceId, companyId } = params
   if (!id) return { error: 'Provide "id" to get or create a user' }
   const MuralUser = Parse.Object.extend('MuralUser')
