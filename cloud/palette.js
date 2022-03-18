@@ -5,6 +5,8 @@ Parse.Cloud.define('getSiteScreenshot', async request => {
   const { brandUrl } = params;
   const axios = await import('axios');
 
+  console.log('====== check check ========')
+
   if (!brandUrl) {
     return { error: 'Please provide field brandUrl' };
   }
