@@ -1,4 +1,4 @@
-const { getUser } = require('../helpers/user')
+// const { getUser } = require('../helpers/user')
 
 Parse.Cloud.define('getSiteScreenshot', async request => {
   const params = request.params;
@@ -74,7 +74,10 @@ Parse.Cloud.define('createPalette', async request => {
   if (!colors || !colors.length) return { error: 'Provide "colors" field to set palette' }
   if (!title) return { error: 'Provide "title" field to set palette' }
 
-  const currentUser = await getUser(muralUsername)
+  const MuralUser = Parse.Object.extend("MuralUser")
+  const userQuery = new Parse.Query(MuralUser)
+  userQuery.equalTo('muralUsername', muralUsername)
+  const currentUser = await userQuery.first()
 
   const Palette = Parse.Object.extend("Palette")
   const palette = new Palette()
@@ -112,7 +115,10 @@ Parse.Cloud.define('getPalette', async request => {
   if (!muralUsername) return { error: 'Provide "muralUsername" in headers' }
   if (!id) return { error: "Provide palette id to get" }
 
-  const currentUser = getUser(muralUsername)
+  const MuralUser = Parse.Object.extend("MuralUser")
+  const userQuery = new Parse.Query(MuralUser)
+  userQuery.equalTo('muralUsername', muralUsername)
+  const currentUser = userQuery.first()
 
   if (!currentUser?.muralUsername) return { error: 'User not found' }
 
