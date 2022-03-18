@@ -192,21 +192,17 @@ Parse.Cloud.define('getOrCreateMuralUser', async request => {
   const params = request.params
   const { id, workspaceId, companyId } = params
   if (!id) return { error: 'Provide "id" to get or create a user' }
-  const User = Parse.Object.extend('MuralUser')
-  const query = new Parse.Query(User)
-  query.equalTo('muralUsername', id)
-  const user = await query.first()
-  console.log('check user => ', user)
+  const MuralUser = Parse.Object.extend('MuralUser')
+  const userQuery = new Parse.Query(MuralUser)
+  userQuery.equalTo('muralUsername', id)
+  const user = await userQuery.first()
   if (!!user) return { result: user }
-  console.log('check !user')
 
-  const newUserInstance = new User()
+  const newUserInstance = new MuralUser()
   try {
     const newUser = await newUserInstance.save({ muralUsername: id, muralWorkspace: workspaceId, muralCompany: companyId })
-    console.log('check new user => ', newUser)
     return { result: newUser }
   } catch (e) {
-    console.log('check error => ', e)
     return { error: e }
   }
 })
