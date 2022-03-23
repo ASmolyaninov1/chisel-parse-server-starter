@@ -1,18 +1,17 @@
-// const { getUser } = require('../helpers/user')
+const { getPalettesByUser, getPaletteByUser } = require('../helpers/palette')
 
 Parse.Cloud.define('getSiteScreenshot', async request => {
-  const params = request.params;
-  const { brandUrl } = params;
-  const axios = await import('axios');
+  const params = request.params
+  const { brandUrl } = params
+  const axios = await import('axios')
 
-  console.log('====== check check ========')
+  const urlExpression = new RegExp('(https?|ftp)://(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?$')
 
-  if (!brandUrl) {
-    return { error: 'Please provide field brandUrl' };
-  }
+  if (!brandUrl) return { error: 'Please provide field brandUrl' }
+  if (!urlExpression.test(brandUrl) || !brandUrl.startsWith('http')) return { error: 'Provide valid url' }
 
   try {
-    const b64screenshotData = await axios.default.get('https://api.apiflash.com/v1/urltoimage', {
+    return await axios.default.get('https://api.apiflash.com/v1/urltoimage', {
       params: {
         access_key: '8050ceb6f483464daf907546ded78c06',
         url: brandUrl,
@@ -21,16 +20,20 @@ Parse.Cloud.define('getSiteScreenshot', async request => {
         no_ads: true
       },
       responseType: 'arraybuffer'
+    }).then(b64screenshotData => {
+      const { data } = b64screenshotData
+      if (!data) return { error: 'Screenshot broken' }
+
+      return { result: data.toString('base64') }
+    }).catch(e => {
+      const status = e.response.status
+      if (status === 400) return { error: 'Invalid url' }
+      return { error: 'Something went wrong' }
     })
-
-    const { data } = b64screenshotData
-    if (!data) return { error: 'Screenshot broken' };
-
-    return { result: data.toString('base64') };
   } catch(err) {
-    return { error: err };
+    return { error: err }
   }
-});
+})
 
 Parse.Cloud.define('getPdfScreenshot', async request => {
   const params = request.params
@@ -66,18 +69,12 @@ Parse.Cloud.define('getPdfScreenshot', async request => {
 Parse.Cloud.define('createPalette', async request => {
   const headers = request.headers
   const params = request.params
-  const { muralUsername } = headers
+  const { user } = headers
   const { colors, title, access } = params
 
-  if (!muralUsername) return { error: 'Provide "muralUsername" header to set palette' }
   if (!access) return { error: 'Provide "access" field to set palette' }
   if (!colors || !colors.length) return { error: 'Provide "colors" field to set palette' }
   if (!title) return { error: 'Provide "title" field to set palette' }
-
-  const MuralUser = Parse.Object.extend("MuralUser")
-  const userQuery = new Parse.Query(MuralUser)
-  userQuery.equalTo('muralUsername', muralUsername)
-  const currentUser = await userQuery.first()
 
   const Palette = Parse.Object.extend("Palette")
   const palette = new Palette()
@@ -86,20 +83,14 @@ Parse.Cloud.define('createPalette', async request => {
     const createdPalette = await palette.save({ colors, title, access })
     const UserPalette = Parse.Object.extend("UserPalette")
     const userPalette = new UserPalette()
-    userPalette.set("paletteId", createdPalette.objectId)
-    userPalette.set("access", access)
-    switch (access) {
-      case 'me':
-        userPalette.set("foreignKey", currentUser.muralUsername)
-        break
-      case 'workspace':
-        userPalette.set("foreignKey", currentUser.muralWorkspace)
-        break
-      case 'company':
-        userPalette.set("foreignKey", currentUser.muralCompany)
-        break
-    }
-    await userPalette.save()
+
+    await userPalette.save({
+      paletteId: createdPalette.id,
+      access,
+      muralUsername: user.get('muralUsername'),
+      muralWorkspace: user.get('muralWorkspace'),
+      muralCompany: user.get('muralCompany')
+    })
 
     return { result: createdPalette }
   } catch (e) {
@@ -110,42 +101,24 @@ Parse.Cloud.define('createPalette', async request => {
 Parse.Cloud.define('getPalette', async request => {
   const params = request.params
   const headers = request.headers
-  const { muralUsername } = headers
+  const { user } = headers
   const { id } = params
-  if (!muralUsername) return { error: 'Provide "muralUsername" in headers' }
   if (!id) return { error: "Provide palette id to get" }
 
-  const MuralUser = Parse.Object.extend("MuralUser")
-  const userQuery = new Parse.Query(MuralUser)
-  userQuery.equalTo('muralUsername', muralUsername)
-  const currentUser = userQuery.first()
-
-  if (!currentUser?.muralUsername) return { error: 'User not found' }
-
   try {
-    const Palette = Parse.Object.extend("Palette")
-    const query = new Parse.Query(Palette)
-
-    const UserPalette = Parse.Object.extend("UserPalette")
-    const userPaletteQuery = new Parse.Query(UserPalette)
-    userPaletteQuery.equalTo('muralUsername', currentUser.muralUsername)
-    userPaletteQuery.equalTo('paletteId', id)
-    const currentUserPalette = await userPaletteQuery.first()
-    if (!currentUserPalette?.paletteId) return { error: 'Palette not found' }
-
-    const currentPalette = await query.get(id)
+    const currentPalette = await getPaletteByUser(id, user)
     return { result: currentPalette }
   } catch (e) {
     return { error: e }
   }
 })
 
-Parse.Cloud.define('getAllPalettes', async (request) => {
-  const Palette = Parse.Object.extend("Palette")
-  const query = new Parse.Query(Palette)
+Parse.Cloud.define('getAllPalettes', async request => {
+  const headers = request.headers
+  const { user } = headers
 
   try {
-    const allPalettes = await query.find()
+    const allPalettes = await getPalettesByUser(user)
     return { result: allPalettes }
   } catch (e) {
     return { error: e }
@@ -154,15 +127,20 @@ Parse.Cloud.define('getAllPalettes', async (request) => {
 
 Parse.Cloud.define('deletePalette', async request => {
   const params = request.params
+  const headers = request.headers
+  const { user } = headers
   const { id } = params
   if (!id) return { error: 'Provide "id" to delete palette' }
 
-  const Palette = Parse.Object.extend("Palette")
-  const query = new Parse.Query(Palette)
+  const currentPalette = await getPaletteByUser(id, user)
+  if (currentPalette?.error) return currentPalette
 
   try {
-    const paletteToDelete = await query.get(id)
-    await paletteToDelete.destroy()
+    const userPaletteQuery = new Parse.Query("UserPalette")
+    userPaletteQuery.equalTo('paletteId', id)
+    const currentUserPalette = userPaletteQuery.first()
+    await currentUserPalette.destroy()
+    await currentPalette.destroy()
     return { result: 'success' }
   } catch (e) {
     return { error: e }
@@ -171,46 +149,29 @@ Parse.Cloud.define('deletePalette', async request => {
 
 Parse.Cloud.define('updatePalette', async (request) => {
   const params = request.params
+  const headers = request.headers
+  const { user } = headers
   const { id, colors, title, access } = params
   const isParamsValid = !!colors || !!title || !!access
-  if (!id || !isParamsValid) {
-    return { error: 'Provide "id" and "colors" or "title" fields to update palette' }
+  if (!id || !isParamsValid) return { error: 'Provide "id" and fields of palette to update fields to update palette' }
+
+  const currentPalette = await getPaletteByUser(id, user)
+  if (currentPalette?.error) return currentPalette
+
+  if (access !== currentPalette.get('access')) {
+    const userPaletteQuery = new Parse.Query("UserPalette")
+    userPaletteQuery.equalTo('paletteId', id)
+    const currentUserPalette = await userPaletteQuery.first()
+    currentUserPalette.set('access', access)
+    await currentUserPalette.save()
   }
 
-  const Palette = Parse.Object.extend("Palette")
-  const query = new Parse.Query(Palette)
-
   try {
-    query.equalTo("objectId", id)
-    return query.find().then(res => {
-      const object = res[0]
-      console.log(object.get('access'))
-      !!colors && object.set('colors', colors)
-      !!title && object.set('title', title)
-      !!access && object.set('access', access)
-      object.save()
-      return { result: 'success' }
-    })
-  } catch (e) {
-    return { error: e }
-  }
-})
-
-Parse.Cloud.define('getOrCreateMuralUser', async request => {
-  const params = request.params
-  console.log('<========= test console log =========>')
-  const { id, workspaceId, companyId } = params
-  if (!id) return { error: 'Provide "id" to get or create a user' }
-  const MuralUser = Parse.Object.extend('MuralUser')
-  const userQuery = new Parse.Query(MuralUser)
-  userQuery.equalTo('muralUsername', id)
-  const user = await userQuery.first()
-  if (!!user) return { result: user }
-
-  const newUserInstance = new MuralUser()
-  try {
-    const newUser = await newUserInstance.save({ muralUsername: id, muralWorkspace: workspaceId, muralCompany: companyId })
-    return { result: newUser }
+    !!colors && currentPalette.set('colors', colors)
+    !!title && currentPalette.set('title', title)
+    !!access && currentPalette.set('access', access)
+    await currentPalette.save()
+    return { result: 'success' }
   } catch (e) {
     return { error: e }
   }

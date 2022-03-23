@@ -10,6 +10,7 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser')
 const packageJSON = require('./package.json');
+const authCheck = require('./middleware/authCheck')
 
 const config = require('./config.json');
 
@@ -72,8 +73,9 @@ const parseGraphQLServer = new ParseGraphQLServer(
 );
 const app = new express();
 app.use(cors())
-app.use('/parse', parseServer.app);
-parseGraphQLServer.applyGraphQL(app);
+app.use('/parse/functions', authCheck)
+app.use('/parse', parseServer.app)
+parseGraphQLServer.applyGraphQL(app)
 
 app.post('/users_code', bodyParser.json(), (req, res, next) => {
   if (req.headers['x-parse-application-id'] == APP_ID && req.headers['x-parse-rest-api-key'] == MASTER_KEY)

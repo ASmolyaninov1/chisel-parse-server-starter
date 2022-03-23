@@ -1,4 +1,4 @@
-console.log('Cloud code connectededed');
+console.log('Cloud code connected');
 
 require('./common');
 require('./palette');
