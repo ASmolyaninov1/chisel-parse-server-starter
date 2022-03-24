@@ -5,7 +5,6 @@ const getPalettesByUser = async (user) => {
 
   const userPaletteQuery = new Parse.Query("UserPalette")
   userPaletteQuery.equalTo('muralUsername', muralUsername)
-  userPaletteQuery.equalTo('access', 'me')
 
   const userPaletteWorkspaceQuery = new Parse.Query("UserPalette")
   userPaletteWorkspaceQuery.equalTo('muralWorkspace', userMuralWorkspace)
@@ -41,16 +40,16 @@ const getPaletteByUser = async (paletteId, user) => {
   const paletteMuralCompany = currentUserPalette.get('muralCompany')
   const paletteAccess = currentUserPalette.get('access')
 
-  let isUserPermitted = false
-  switch (paletteAccess) {
-    case 'me':
-      isUserPermitted = paletteMuralUsername === muralUsername
-      break
-    case 'workspace':
-      isUserPermitted = paletteMuralWorkspace === muralWorkspace
-      break
-    case 'company':
-      isUserPermitted = paletteMuralCompany && paletteMuralCompany === muralCompany
+  let isUserPermitted = paletteMuralUsername === muralUsername
+  if (!isUserPermitted) {
+    switch (paletteAccess) {
+      case 'workspace':
+        isUserPermitted = paletteMuralWorkspace === muralWorkspace
+        break
+      case 'company':
+        isUserPermitted = paletteMuralCompany && paletteMuralCompany === muralCompany
+        break
+    }
   }
 
   if (!isUserPermitted) {
