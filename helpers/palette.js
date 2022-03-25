@@ -3,26 +3,19 @@ const getPalettesByUser = async (user) => {
   const userMuralWorkspace = user.get('muralWorkspace')
   const userMuralCompany = user.get('muralCompany')
 
-  const userPaletteQuery = new Parse.Query("UserPalette")
-  userPaletteQuery.equalTo('muralUsername', muralUsername)
+  const paletteQuery = new Parse.Query("Palette")
+  paletteQuery.equalTo('muralUsername', muralUsername)
 
-  const userPaletteWorkspaceQuery = new Parse.Query("UserPalette")
-  userPaletteWorkspaceQuery.equalTo('muralWorkspace', userMuralWorkspace)
-  userPaletteWorkspaceQuery.equalTo('access', 'workspace')
+  const paletteWorkspaceQuery = new Parse.Query("Palette")
+  paletteWorkspaceQuery.equalTo('muralWorkspace', userMuralWorkspace)
+  paletteWorkspaceQuery.equalTo('access', 'workspace')
 
-  const userPaletteCompanyQuery = new Parse.Query("UserPalette")
-  userPaletteCompanyQuery.equalTo('muralCompany', userMuralCompany)
-  userPaletteCompanyQuery.equalTo('access', 'company')
+  const paletteCompanyQuery = new Parse.Query("Palette")
+  paletteCompanyQuery.equalTo('muralCompany', userMuralCompany)
+  paletteCompanyQuery.equalTo('access', 'company')
 
-  const query = Parse.Query.or(userPaletteQuery, userPaletteWorkspaceQuery, userPaletteCompanyQuery)
-  const userPalettes = await query.findAll()
-  if (userPalettes.length === 0) return []
-  const userPalettesIds = userPalettes.map(el => el.get('paletteId'))
-
-  const Palette = Parse.Object.extend('Palette')
-  const paletteQuery = new Parse.Query(Palette)
-  paletteQuery.containedIn('objectId', userPalettesIds)
-  return paletteQuery.findAll()
+  const query = Parse.Query.or(paletteQuery, paletteWorkspaceQuery, paletteCompanyQuery)
+  return await query.findAll()
 }
 
 const getPaletteByUser = async (paletteId, user) => {
@@ -30,15 +23,13 @@ const getPaletteByUser = async (paletteId, user) => {
   const muralWorkspace = user.get('muralWorkspace')
   const muralCompany = user.get('muralCompany')
 
-  const userPaletteQuery = new Parse.Query("UserPalette")
-  userPaletteQuery.equalTo('paletteId', paletteId)
-  const currentUserPalette = await userPaletteQuery.first()
-  if (!currentUserPalette) return { error: 'Palette not found' }
+  const paletteQuery = new Parse.Query("Palette")
+  const currentPalette = await paletteQuery.get(paletteId)
 
-  const paletteMuralUsername = currentUserPalette.get('muralUsername')
-  const paletteMuralWorkspace = currentUserPalette.get('muralWorkspace')
-  const paletteMuralCompany = currentUserPalette.get('muralCompany')
-  const paletteAccess = currentUserPalette.get('access')
+  const paletteMuralUsername = currentPalette.get('muralUsername')
+  const paletteMuralWorkspace = currentPalette.get('muralWorkspace')
+  const paletteMuralCompany = currentPalette.get('muralCompany')
+  const paletteAccess = currentPalette.get('access')
 
   let isUserPermitted = paletteMuralUsername === muralUsername
   if (!isUserPermitted) {
@@ -56,8 +47,7 @@ const getPaletteByUser = async (paletteId, user) => {
     return { error: 'You do not have access to this palette' }
   }
 
-  const paletteQuery = new Parse.Query('Palette')
-  return paletteQuery.get(paletteId)
+  return currentPalette
 }
 
 module.exports = { getPalettesByUser, getPaletteByUser }

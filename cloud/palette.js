@@ -80,12 +80,9 @@ Parse.Cloud.define('createPalette', async request => {
   const palette = new Palette()
 
   try {
-    const createdPalette = await palette.save({ colors, title, access })
-    const UserPalette = Parse.Object.extend("UserPalette")
-    const userPalette = new UserPalette()
-
-    await userPalette.save({
-      paletteId: createdPalette.id,
+    const createdPalette = await palette.save({
+      colors,
+      title,
       access,
       muralUsername: user.get('muralUsername'),
       muralWorkspace: user.get('muralWorkspace'),
@@ -130,16 +127,24 @@ Parse.Cloud.define('deletePalette', async request => {
   const headers = request.headers
   const { user } = headers
   const { id } = params
+  const userDefaultPaletteId = user.get('defaultPaletteId')
+  const userFavouritePalettesIds = user.get('favouritePalettesIds')
   if (!id) return { error: 'Provide "id" to delete palette' }
 
   const currentPalette = await getPaletteByUser(id, user)
   if (currentPalette?.error) return currentPalette
 
+  if (!!userDefaultPaletteId && userDefaultPaletteId === id) {
+    user.set('defaultPaletteId', null)
+    await user.save()
+  }
+  if (userFavouritePalettesIds && userFavouritePalettesIds.includes(id)) {
+    const newUserFavouritePalettesIds = userFavouritePalettesIds.filter(paletteId => paletteId !== id)
+    user.set('favouritePalettesIds', newUserFavouritePalettesIds)
+    await user.save()
+  }
+
   try {
-    const userPaletteQuery = new Parse.Query("UserPalette")
-    userPaletteQuery.equalTo('paletteId', id)
-    const currentUserPalette = userPaletteQuery.first()
-    await currentUserPalette.destroy()
     await currentPalette.destroy()
     return { result: 'success' }
   } catch (e) {
@@ -158,14 +163,6 @@ Parse.Cloud.define('updatePalette', async (request) => {
   const currentPalette = await getPaletteByUser(id, user)
   if (currentPalette?.error) return currentPalette
 
-  if (access !== currentPalette.get('access')) {
-    const userPaletteQuery = new Parse.Query("UserPalette")
-    userPaletteQuery.equalTo('paletteId', id)
-    const currentUserPalette = await userPaletteQuery.first()
-    currentUserPalette.set('access', access)
-    await currentUserPalette.save()
-  }
-
   try {
     !!colors && currentPalette.set('colors', colors)
     !!title && currentPalette.set('title', title)
@@ -176,3 +173,4 @@ Parse.Cloud.define('updatePalette', async (request) => {
     return { error: e }
   }
 })
+
